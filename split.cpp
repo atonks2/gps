@@ -1,7 +1,6 @@
 #include <iostream>
 #include <string.h>
 #include <vector>
-#include <typeinfo>
 
 std::vector<std::string> split(const std::string sentence, const char delim)
 {
