@@ -1,34 +1,30 @@
 #include <iostream>
 #include <string.h>
 #include <vector>
+#include <typeinfo>
 
-/*
-* Change split() to use traditional for loop and substrings.
-*/
-
-std::vector<std::string> split(const std::string sentence, const char d)
+std::vector<std::string> split(const std::string sentence, const char delim)
 {
-	std::vector<std::string> parsed;
-	std::string buffer = "";
+	std::vector<std::string> parsed; /* Vector to hold parsed data */
+	std::string buffer = ""; /* A buffer to store each chunck before pushing into the vector */
 	for (auto i:sentence)
 	{
-		if (i != d) buffer += i;
-		else if (i == d)
+		if (i != delim) buffer += i; /* if not delimiter, add char to buffer */
+		else if (i == delim) /* delimiter found. Add it to the vector */
 		{
 			parsed.push_back(buffer);
-			buffer = "";
+			buffer = ""; /* Reset the buffer */
 		}
 	}
+	if (buffer != "") parsed.push_back(buffer); /* Add last piece of data to vector (NMEA sentences don't end with a comma) */
 	return parsed;
 }
 
+/* Simple test cases */
 int main()
 {
-	std::string data = "$GPRMC, ,044954.000,A,3706.7967,N,11332.4225,W,0.00,11.76,050217,,,D*4F";
+	std::string data = "$GPGGA,210658.000,3706.7984,N,11332.4191,W,1,10,0.9,844.3,M,-20.5,M,,0000*60";
 	std::vector<std::string> parsed_data{split(data, ',')};
-	for (int i = 0; i <= parsed_data.size(); i++)
-	{
-		std::cout << parsed_data[i] << ",";
-	}
-	std::cout << std::endl;
+	std::cout << "\nTest case: " << data << std::endl << "Result:\n" << "---------------------\n";
+	for (auto elem:parsed_data) std::cout << elem << std::endl;
 }
