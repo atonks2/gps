@@ -2,11 +2,6 @@
 #include <string>
 #include <vector>
 
-/* Function to parse a string based on a provided delimiter and return result as a vector of strings.
-*	Credit for this code goes to bayusetiaji. The code here is just a slight modification of this code:
-*	http://www.cplusplus.com/articles/2wA0RXSz/ 
-*/
-
 struct UTC {
     int rawUTC;
     int hours;
@@ -54,16 +49,20 @@ float formatLat(std::string lat)
     return (deg + minutes);
 }
 
+UTC formatTime(std::string utc)
+{
+	UTC time;
+	time.rawUTC = std::stoi(utc);
+	time.hours = std::stoi(utc.substr(0, 2));
+	time.minutes = std::stoi(utc.substr(2, 2));
+	time.seconds = std::stoi(utc.substr(4, 2));
+	return time;
+}
+
 GPGGA assignGGA(const std::vector<std::string> data)
 {
     GPGGA nmea;
-    int time = std::stoi(data[1]);
-    nmea.time.rawUTC = time;
-    nmea.time.hours = (time / 10000);
-    time = time % 10000;
-    nmea.time.minutes = (time / 100);
-    nmea.time.seconds = (time % 100);
-
+	nmea.time = formatTime(data[1]);
     nmea.latitude = formatLat(data[2]);
 
     return nmea;
