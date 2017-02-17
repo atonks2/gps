@@ -81,8 +81,8 @@ void printGGA(GPGGA data)
     std::cout << "Hours: " << data.time.hours << std::endl;
     std::cout << "Minutes: " << data.time.minutes << std::endl;
     std::cout << "Seconds: " << data.time.seconds << std::endl;
-	std::cout << "Formatted latitude: " << test.latitude << std::endl;
-	std::cout << "Formatted longitude: " << test.longitude << std::endl;
+	std::cout << "Formatted latitude: " << data.latitude << std::endl;
+	std::cout << "Formatted longitude: " << data.longitude << std::endl;
 }
 
 int main()
