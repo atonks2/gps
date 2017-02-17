@@ -49,6 +49,13 @@ float formatLat(std::string lat)
     return (deg + minutes);
 }
 
+float formatLong(std::string longitude)
+{
+	float deg = std::stof(longitude.substr(0, 3));
+	float minutes = (std::stof(longitude.substr(3, longitude.length())) / 60.00);
+	return (deg + minutes);
+}
+
 UTC formatTime(std::string utc)
 {
 	UTC time;
@@ -64,7 +71,7 @@ GPGGA assignGGA(const std::vector<std::string> data)
     GPGGA nmea;
 	nmea.time = formatTime(data[1]);
     nmea.latitude = formatLat(data[2]);
-
+	nmea.longitude = formatLong(data[3]);
     return nmea;
 }
 
@@ -74,18 +81,18 @@ void printGGA(GPGGA data)
     std::cout << "Hours: " << data.time.hours << std::endl;
     std::cout << "Minutes: " << data.time.minutes << std::endl;
     std::cout << "Seconds: " << data.time.seconds << std::endl;
+	std::cout << "Formatted latitude: " << test.latitude << std::endl;
+	std::cout << "Formatted longitude: " << test.longitude << std::endl;
 }
 
 int main()
 {
-	std::string data = "$GPGGA,210658.000,0302.78469,N,XXXXX.XXXX,W,1,10,0.9,844.3,M,-20.5,M,,0000*60";
+	std::string data = "$GPGGA,210658.000,0302.78469,N,10141.82531,W,1,10,0.9,844.3,M,-20.5,M,,0000*60";
 	std::vector<std::string> parsed_data{split(data, ',')};
 	std::cout << "\nTest case: " << data << std::endl << "Result:\n" << "---------------------\n";
 	for (auto elem:parsed_data) std::cout << elem << std::endl;
 
     GPGGA test = assignGGA(parsed_data);
     printGGA(test);
-
-    std::cout << "Formatted latitude: " << test.latitude << std::endl;
     return 0;
 }
