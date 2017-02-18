@@ -42,6 +42,17 @@ std::vector<std::string> split(const std::string& sentence, const char& delim) /
 	return parsed;
 }
 
+int checksum(std::string sentence)
+{
+    int sum = 0;
+    sentence = sentence.substr(1,(sentence.length()-4));
+    for (auto i:sentence)
+    {
+        sum ^= i;
+    }
+    return sum;
+}
+
 float formatLat(std::string lat)
 {
     float deg = std::stof(lat.substr(0,2));
@@ -110,7 +121,7 @@ void printGGA(GPGGA data)
 
 int main()
 {
-	std::string data = "$GPGGA,202318.000,3706.7978,N,11332.4202,W,1,10,0.9,844.7,M,-20.5,M,,0000*6C";
+	std::string data = "$GPGGA,030059.000,3706.7966,N,11332.4206,W,2,11,0.8,842.5,M,-20.5,M,2.0,0000*49";
 	std::vector<std::string> parsed_data{split(data, ',')};
 	std::cout << "\nTest case: " << data << std::endl << "Result:\n" << "---------------------\n";
     GPGGA test = assignGGA(parsed_data);
