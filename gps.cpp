@@ -71,7 +71,20 @@ GPGGA assignGGA(const std::vector<std::string> data)
     GPGGA nmea;
 	nmea.time = formatTime(data[1]);
     nmea.latitude = formatLat(data[2]);
-	nmea.longitude = formatLong(data[3]);
+    nmea.latDirection = data[3][0];
+    if (nmea.latDirection == 'S') nmea.latitude *= -1.00;
+	nmea.longitude = formatLong(data[4]);
+    nmea.longDirection = data[5][0];  // data[i] is a string, data[i][0] is the first element of that string.
+    if (nmea.longDirection == 'W') nmea.longitude *= -1.00;
+    nmea.fix = std::stoi(data[6]);
+    nmea.satsInView = std::stoi(data[7]);
+    nmea.HDOP = std::stof(data[8]);
+    nmea.altitude = std::stof(data[9]);
+    nmea.geoid = std::stof(data[11]);
+    if (data[13] == "") nmea.lastDGPS = -1.00;
+    else nmea.lastDGPS = std::stof(data[13]);
+    nmea.DGPSid = std::stoi(data[14].substr(0,4));
+    nmea.checksum = std::stoul(data[14].substr(5,2),nullptr,16);
     return nmea;
 }
 
@@ -81,17 +94,25 @@ void printGGA(GPGGA data)
     std::cout << "Hours: " << data.time.hours << std::endl;
     std::cout << "Minutes: " << data.time.minutes << std::endl;
     std::cout << "Seconds: " << data.time.seconds << std::endl;
-	std::cout << "Formatted latitude: " << data.latitude << std::endl;
-	std::cout << "Formatted longitude: " << data.longitude << std::endl;
+	std::cout << "Latitude: " << data.latitude << std::endl;
+    std::cout << "Direction: " << data.latDirection << std::endl;
+    std::cout << "Longitude: " << data.longitude << std::endl;
+    std::cout << "Direction: " << data.longDirection << std::endl;
+    std::cout << "Fix type: " << data.fix << std::endl;
+    std::cout << "Sats In View: " << data.satsInView << std::endl;
+    std::cout << "Horizontal DOP: " << data.HDOP << std::endl;
+    std::cout << "Altitude: " << data.altitude << std::endl;
+    std::cout << "Geoid: " << data.geoid << std::endl;
+    std::cout << "Last DGPS: " << data.lastDGPS << std::endl;
+    std::cout << "DGPS Station: " << data.DGPSid << std::endl;
+    std::cout << "Checksum: " << data.checksum << std::endl;
 }
 
 int main()
 {
-	std::string data = "$GPGGA,210658.000,0302.78469,N,10141.82531,W,1,10,0.9,844.3,M,-20.5,M,,0000*60";
+	std::string data = "$GPGGA,202318.000,3706.7978,N,11332.4202,W,1,10,0.9,844.7,M,-20.5,M,,0000*6C";
 	std::vector<std::string> parsed_data{split(data, ',')};
 	std::cout << "\nTest case: " << data << std::endl << "Result:\n" << "---------------------\n";
-	for (auto elem:parsed_data) std::cout << elem << std::endl;
-
     GPGGA test = assignGGA(parsed_data);
     printGGA(test);
     return 0;
