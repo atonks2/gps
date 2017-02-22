@@ -3,6 +3,8 @@
 #include <vector>
 #include "serial.h"
 
+// useful calculations: http://www.movable-type.co.uk/scripts/latlong.html
+    
 Serial gps(4800,"/dev/ttyUSB0");
 
 struct UTC {
@@ -115,6 +117,7 @@ GPGGA assignGGA(const std::vector<std::string> data)
 
 void printGGA(GPGGA data)
 {
+    std::cout << "\nResult:\n" << "---------------------\n";
     std::cout << "Raw UTC time: " << data.time.rawUTC << std::endl;
     std::cout << "Hours: " << data.time.hours << std::endl;
     std::cout << "Minutes: " << data.time.minutes << std::endl;
@@ -130,15 +133,19 @@ void printGGA(GPGGA data)
     std::cout << "Geoid: " << data.geoid << std::endl;
     std::cout << "Last DGPS: " << data.lastDGPS << std::endl;
     std::cout << "DGPS Station: " << data.DGPSid << std::endl;
-    std::cout << "Checksum: " << std::hex << data.checksum << std::endl;
+    std::cout << "Checksum: " << std::hex << data.checksum << std::dec << std::endl;
 }
 
 int main()
 {
     std::string data = getGPGGA();
     std::vector<std::string> parsed_data{split(data, ',')};
-    std::cout << "\nTest case: " << data << std::endl << "Result:\n" << "---------------------\n";
-    GPGGA test = assignGGA(parsed_data);
-    printGGA(test);
+    GPGGA first = assignGGA(parsed_data);
+    printGGA(first);
+
+    data = getGPGGA();
+    parsed_data = split(data, ',');
+    GPGGA second = assignGGA(parsed_data);
+    printGGA(second);
     return 0;
 }
