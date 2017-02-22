@@ -1,6 +1,9 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include "serial.h"
+
+Serial gps(4800,"/dev/ttyUSB0");
 
 struct UTC {
     int rawUTC;
@@ -24,6 +27,17 @@ struct GPGGA { /* Global Positioning System Fix Data */
     int     DGPSid;
     int     checksum;
 };
+
+std::string getGPGGA()
+{
+    std::string data;
+    do {
+        //gps.flush();
+        gps.serialRead();
+        data = gps.getData();
+    } while (data.substr(0,6) != "$GPGGA");
+    return data;
+}
 
 std::vector<std::string> split(const std::string& sentence, const char& delim) /* passing by reference to avoid unnecessary copy of variables */
 {
@@ -80,11 +94,11 @@ UTC formatTime(std::string utc)
 GPGGA assignGGA(const std::vector<std::string> data)
 {
     GPGGA nmea;
-	nmea.time = formatTime(data[1]);
+    nmea.time = formatTime(data[1]);
     nmea.latitude = formatLat(data[2]);
     nmea.latDirection = data[3][0];
     if (nmea.latDirection == 'S') nmea.latitude *= -1.00;
-	nmea.longitude = formatLong(data[4]);
+    nmea.longitude = formatLong(data[4]);
     nmea.longDirection = data[5][0];  // data[i] is a string, data[i][0] is the first element of that string.
     if (nmea.longDirection == 'W') nmea.longitude *= -1.00;
     nmea.fix = std::stoi(data[6]);
@@ -105,7 +119,7 @@ void printGGA(GPGGA data)
     std::cout << "Hours: " << data.time.hours << std::endl;
     std::cout << "Minutes: " << data.time.minutes << std::endl;
     std::cout << "Seconds: " << data.time.seconds << std::endl;
-	std::cout << "Latitude: " << data.latitude << std::endl;
+    std::cout << "Latitude: " << data.latitude << std::endl;
     std::cout << "Direction: " << data.latDirection << std::endl;
     std::cout << "Longitude: " << data.longitude << std::endl;
     std::cout << "Direction: " << data.longDirection << std::endl;
@@ -116,14 +130,14 @@ void printGGA(GPGGA data)
     std::cout << "Geoid: " << data.geoid << std::endl;
     std::cout << "Last DGPS: " << data.lastDGPS << std::endl;
     std::cout << "DGPS Station: " << data.DGPSid << std::endl;
-    std::cout << "Checksum: " << data.checksum << std::endl;
+    std::cout << "Checksum: " << std::hex << data.checksum << std::endl;
 }
 
 int main()
 {
-	std::string data = "$GPGGA,030059.000,3706.7966,N,11332.4206,W,2,11,0.8,842.5,M,-20.5,M,2.0,0000*49";
-	std::vector<std::string> parsed_data{split(data, ',')};
-	std::cout << "\nTest case: " << data << std::endl << "Result:\n" << "---------------------\n";
+    std::string data = getGPGGA();
+    std::vector<std::string> parsed_data{split(data, ',')};
+    std::cout << "\nTest case: " << data << std::endl << "Result:\n" << "---------------------\n";
     GPGGA test = assignGGA(parsed_data);
     printGGA(test);
     return 0;
