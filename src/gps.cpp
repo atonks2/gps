@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include "serial.h"
+#include <cmath>
 
 // useful calculations: http://www.movable-type.co.uk/scripts/latlong.html
     
@@ -114,6 +115,43 @@ GPGGA assignGGA(const std::vector<std::string> data)
     return nmea;
 }
 
+double distance(double lat_a, double long_a, double lat_b, double long_b)
+{
+	const double radius = 6378.137;  // Radius at equator
+	const double to_radians = (3.1415926536 / 180.00);
+	lat_a *= to_radians;
+	lat_b *= to_radians;
+	long_a *= to_radians;
+	long_b *= to_radians;
+	
+	double d_lat = lat_b - lat_a;
+	double d_long = long_b - long_a;
+	
+	double a = pow(sin(d_lat/2),2) + pow(sin(d_long/2),2) * cos(lat_a) * cos(lat_b);
+	double c = 2 * atan2(sqrt(a),sqrt(1-a));
+	
+	return (radius * c);
+}
+
+double bearing(double lat_a, double long_a, double lat_b, double long_b)
+{
+    const double to_radians = (3.1415926536 / 180.00);
+    const double to_degrees = (180.00 / 3.1415926536);
+
+    lat_a *= to_radians;
+    lat_b *= to_radians;
+    long_a *= to_radians;
+    long_b *= to_radians;
+
+    double d_lat = lat_b - lat_a;
+    double d_long = long_b - long_a;
+
+    double y = sin(d_long) * cos(lat_b);
+    double x = (cos(lat_a) * sin(lat_b)) - (sin(lat_a) * cos(lat_b) * cos(d_long));
+
+    return ((atan2(y, x) * to_degrees) + 360.00);
+}
+
 void printGGA(GPGGA data)
 {
     std::cout << "\nResult:\n" << "---------------------\n";
@@ -146,5 +184,8 @@ int main()
     parsed_data = split(data, ',');
     GPGGA second = assignGGA(parsed_data);
     printGGA(second);
+
+    std::cout << "\n--------------------\nDistance: " << distance(first.latitude, first.longitude, 36.1699412, -115.139829) << std::endl;
+    std::cout << "Bearing: " << bearing(first.latitude, first.longitude, 36.1699412, -115.139829) << " degrees\n";
     return 0;
 }
