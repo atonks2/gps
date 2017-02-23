@@ -16,16 +16,16 @@ struct UTC {
 
 struct GPGGA { /* Global Positioning System Fix Data */
     UTC     time;
-    float   latitude;  // ddmm.mmmm
+    double  latitude;  // ddmm.mmmm
     char    latDirection;
-    float   longitude;  //dddmm.mmmm
+    double  longitude;  //dddmm.mmmm
     char    longDirection;
     int     fix;
     int     satsInView;
-    float   HDOP;
-    float   altitude;
-    float   geoid;
-    float   lastDGPS;
+    double  HDOP;
+    double  altitude;
+    double  geoid;
+    double  lastDGPS;
     int     DGPSid;
     int     checksum;
 };
@@ -34,7 +34,6 @@ std::string getGPGGA()
 {
     std::string data;
     do {
-        //gps.flush();
         gps.serialRead();
         data = gps.getData();
     } while (data.substr(0,6) != "$GPGGA");
@@ -69,17 +68,17 @@ int checksum(std::string sentence)
     return sum;
 }
 
-float formatLat(std::string lat)
+double formatLat(std::string lat)
 {
-    float deg = std::stof(lat.substr(0,2));
-    float minutes = (std::stof(lat.substr(2,lat.length())) / 60.00);
+    double deg = std::stof(lat.substr(0,2));
+    double minutes = (std::stof(lat.substr(2,lat.length())) / 60.00);
     return (deg + minutes);
 }
 
-float formatLong(std::string longitude)
+double formatLong(std::string longitude)
 {
-	float deg = std::stof(longitude.substr(0, 3));
-	float minutes = (std::stof(longitude.substr(3, longitude.length())) / 60.00);
+	double deg = std::stof(longitude.substr(0, 3));
+	double minutes = (std::stof(longitude.substr(3, longitude.length())) / 60.00);
 	return (deg + minutes);
 }
 
@@ -105,11 +104,11 @@ GPGGA assignGGA(const std::vector<std::string> data)
     if (nmea.longDirection == 'W') nmea.longitude *= -1.00;
     nmea.fix = std::stoi(data[6]);
     nmea.satsInView = std::stoi(data[7]);
-    nmea.HDOP = std::stof(data[8]);
-    nmea.altitude = std::stof(data[9]);
-    nmea.geoid = std::stof(data[11]);
+    nmea.HDOP = std::stod(data[8]);
+    nmea.altitude = std::stod(data[9]);
+    nmea.geoid = std::stod(data[11]);
     if (data[13] == "") nmea.lastDGPS = -1.00;
-    else nmea.lastDGPS = std::stof(data[13]);
+    else nmea.lastDGPS = std::stod(data[13]);
     nmea.DGPSid = std::stoi(data[14].substr(0,4));
     nmea.checksum = std::stoul(data[14].substr(5,2),nullptr,16);
     return nmea;
