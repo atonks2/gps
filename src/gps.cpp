@@ -29,8 +29,6 @@ SOFTWARE.
 #include "serial.h"
 #include "gps.h"
 
-// useful calculations: http://www.movable-type.co.uk/scripts/latlong.html
-
 std::string getGPGGA()
 {
     std::string data;
