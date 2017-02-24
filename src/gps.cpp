@@ -156,8 +156,9 @@ double GPS::bearing(double latA, double longA, double latB, double longB)
     double y = sin(d_long) * cos(latB);
     double x = (cos(latA) * sin(latB)) - (sin(latA) * cos(latB) * cos(d_long));
 
+	// atan2 returns values between -180 and 180 degrees
     double bearing = (atan2(y,x) * to_degrees);
-    bearing = fmod((bearing + 360.00),360.00);
+    bearing = fmod((bearing + 360.00),360.00);  // Shift values to be between 0 and 360 degrees
     return bearing;
 }
 
