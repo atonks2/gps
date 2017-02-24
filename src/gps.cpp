@@ -156,7 +156,9 @@ double GPS::bearing(double latA, double longA, double latB, double longB)
     double y = sin(d_long) * cos(latB);
     double x = (cos(latA) * sin(latB)) - (sin(latA) * cos(latB) * cos(d_long));
 
-    return ((atan2(y, x) * to_degrees) + 360.00);
+    double bearing = (atan2(y,x) * to_degrees);
+    bearing = fmod((bearing + 360.00),360.00);
+    return bearing;
 }
 
 void GPS::printGPGGA(GPGGA data)
