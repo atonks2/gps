@@ -41,7 +41,8 @@ public:
 	int calculateChecksum(std::string sentence);
 
 	// Used to verify checksum of nmea sentence received
-	// sentence is full nmea sentence sent by GPS
+	// std::string sentence is full nmea sentence sent by GPS
+	// returns 0 if sums match
 	int verifyChecksum(std::string sentence);
 
 	// Calculate bearing to destination

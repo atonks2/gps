@@ -29,17 +29,16 @@ SOFTWARE.
 #include "serial.h"
 #include "gps.h"
 
-std::string getGPGGA()
+std::string GPS::getGPGGA()
 {
     std::string data;
     do {
-        gps.serialRead();
-        data = gps.getData();
+        data = gps.serialRead();
     } while (data.substr(0,6) != "$GPGGA");
     return data;
 }
 
-std::vector<std::string> split(const std::string& sentence, const char& delim) /* passing by reference to avoid unnecessary copy of variables */
+std::vector<std::string> GPS::splitNmea(const std::string& sentence, const char& delim) /* passing by reference to avoid unnecessary copy of variables */
 {
 	std::vector<std::string> parsed; /* Vector to hold parsed data */
 	std::string buffer = ""; /* A buffer to store each chunck before pushing into the vector */
@@ -56,32 +55,45 @@ std::vector<std::string> split(const std::string& sentence, const char& delim) /
 	return parsed;
 }
 
-int checksum(std::string sentence)
+int GPS::calculateChecksum(std::string sentence)
+{
+	int sum = 0;
+	sentence = sentence.substr(1, sentence.lenght() - 4); // NMEA checksum includes everything between '$' and '*'
+	for (auto i : sentence)
+	{
+		sum ^= i;
+	}
+	return sum;
+}
+
+int GPS::verifyChecksum(std::string sentence)
 {
     int sum = 0;
-    sentence = sentence.substr(1,(sentence.length()-4));
+	int checksum = (int)std::strtoul((sentence.substr(sentence.length() - 2, 2).c_str()),nullptr,2);
+    sentence = sentence.substr(1,(sentence.length());
     for (auto i:sentence)
     {
         sum ^= i;
     }
-    return sum;
+	if (checksum == sum) return 0;
+	else return -1;
 }
 
-double formatLat(std::string lat)
+double GPS::formatLat(std::string lat)
 {
     double deg = std::stof(lat.substr(0,2));
     double minutes = (std::stof(lat.substr(2,lat.length())) / 60.00);
     return (deg + minutes);
 }
 
-double formatLong(std::string longitude)
+double GPS::formatLong(std::string longitude)
 {
 	double deg = std::stof(longitude.substr(0, 3));
 	double minutes = (std::stof(longitude.substr(3, longitude.length())) / 60.00);
 	return (deg + minutes);
 }
 
-UTC formatTime(std::string utc)
+UTC GPS::formatTime(std::string utc)
 {
 	UTC time;
 	time.rawUTC = std::stoi(utc);
@@ -91,7 +103,7 @@ UTC formatTime(std::string utc)
 	return time;
 }
 
-GPGGA assignGGA(const std::vector<std::string> data)
+GPGGA GPS::assignGPGGA(const &std::vector<std::string> sentence)
 {
     GPGGA nmea;
     nmea.time = formatTime(data[1]);
@@ -113,7 +125,7 @@ GPGGA assignGGA(const std::vector<std::string> data)
     return nmea;
 }
 
-double distance(double lat_a, double long_a, double lat_b, double long_b)
+double GPS::distance(double latA, double longA, double latB, double longB)
 {
 	const double radius = 6378.137;  // Radius at equator
 	const double to_radians = (3.1415926536 / 180.00);
@@ -131,7 +143,7 @@ double distance(double lat_a, double long_a, double lat_b, double long_b)
 	return (radius * c);
 }
 
-double bearing(double lat_a, double long_a, double lat_b, double long_b)
+double GPS::bearing(double latA, double longA, double latB, double longB)
 {
     const double to_radians = (3.1415926536 / 180.00);
     const double to_degrees = (180.00 / 3.1415926536);
@@ -150,7 +162,7 @@ double bearing(double lat_a, double long_a, double lat_b, double long_b)
     return ((atan2(y, x) * to_degrees) + 360.00);
 }
 
-void printGGA(GPGGA data)
+void GPS::printGPGGA(GPGGA data)
 {
     std::cout << "\nResult:\n" << "---------------------\n";
     std::cout << "Raw UTC time: " << data.time.rawUTC << std::endl;
@@ -169,4 +181,12 @@ void printGGA(GPGGA data)
     std::cout << "Last DGPS: " << data.lastDGPS << std::endl;
     std::cout << "DGPS Station: " << data.DGPSid << std::endl;
     std::cout << "Checksum: " << std::hex << data.checksum << std::dec << std::endl;
+}
+
+GPGGA GPS::updateGPGGA()
+{
+	std::string data = getGPGGA();
+	std::vector<std::string> parsed_data{ split(data, ',') };
+
+	return assignGPGGA(parsed_data);
 }
