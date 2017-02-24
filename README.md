@@ -1,4 +1,4 @@
 # GPS Testing
-This repository is for testing individual functions that will go into the GPS Class
-# split.cpp
-- Splits a NMEA sentence into a vector of strings.
+- This code will become a class for working with a GPS
+
+## Now supports calculation of distance (Haversine) and bearing
