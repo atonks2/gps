@@ -55,7 +55,7 @@ std::vector<std::string> GPS::splitNmea(const std::string& sentence, const char&
 int GPS::calculateChecksum(std::string sentence)
 {
 	int sum = 0;
-	sentence = sentence.substr(1, sentence.lenght() - 4); // NMEA checksum includes everything between '$' and '*'
+	sentence = sentence.substr(1, sentence.length() - 4); // NMEA checksum includes everything between '$' and '*'
 	for (auto i : sentence)
 	{
 		sum ^= i;
@@ -67,7 +67,7 @@ int GPS::verifyChecksum(std::string sentence)
 {
     int sum = 0;
 	int checksum = (int)std::strtoul((sentence.substr(sentence.length() - 2, 2).c_str()),nullptr,2);
-    sentence = sentence.substr(1,(sentence.length());
+    sentence = sentence.substr(1,(sentence.length()));
     for (auto i:sentence)
     {
         sum ^= i;
@@ -103,22 +103,22 @@ UTC GPS::formatTime(std::string utc)
 GPGGA GPS::assignGPGGA(std::vector<std::string> sentence)
 {
     GPGGA nmea;
-    nmea.time = formatTime(data[1]);
-    nmea.latitude = formatLat(data[2]);
-    nmea.latDirection = data[3][0];
+    nmea.time = formatTime(sentence[1]);
+    nmea.latitude = formatLat(sentence[2]);
+    nmea.latDirection = sentence[3][0];
     if (nmea.latDirection == 'S') nmea.latitude *= -1.00;
-    nmea.longitude = formatLong(data[4]);
-    nmea.longDirection = data[5][0];  // data[i] is a string, data[i][0] is the first element of that string.
+    nmea.longitude = formatLong(sentence[4]);
+    nmea.longDirection = sentence[5][0];  // sentence[i] is a string, sentence[i][0] is the first element of that string.
     if (nmea.longDirection == 'W') nmea.longitude *= -1.00;
-    nmea.fix = std::stoi(data[6]);
-    nmea.satsInView = std::stoi(data[7]);
-    nmea.HDOP = std::stod(data[8]);
-    nmea.altitude = std::stod(data[9]);
-    nmea.geoid = std::stod(data[11]);
-    if (data[13] == "") nmea.lastDGPS = -1.00;
-    else nmea.lastDGPS = std::stod(data[13]);
-    nmea.DGPSid = std::stoi(data[14].substr(0,4));
-    nmea.checksum = std::stoul(data[14].substr(5,2),nullptr,16);
+    nmea.fix = std::stoi(sentence[6]);
+    nmea.satsInView = std::stoi(sentence[7]);
+    nmea.HDOP = std::stod(sentence[8]);
+    nmea.altitude = std::stod(sentence[9]);
+    nmea.geoid = std::stod(sentence[11]);
+    if (sentence[13] == "") nmea.lastDGPS = -1.00;
+    else nmea.lastDGPS = std::stod(sentence[13]);
+    nmea.DGPSid = std::stoi(sentence[14].substr(0,4));
+    nmea.checksum = std::stoul(sentence[14].substr(5,2),nullptr,16);
     return nmea;
 }
 
@@ -183,7 +183,7 @@ void GPS::printGPGGA(GPGGA data)
 GPGGA GPS::updateGPGGA()
 {
 	std::string data = getGPGGA();
-	std::vector<std::string> parsed_data{ split(data, ',') };
+	std::vector<std::string> parsed_data{ splitNmea(data, ',') };
 
 	currentGPGGA = assignGPGGA(parsed_data);
 	return currentGPGGA;
