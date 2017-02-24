@@ -1,35 +1,35 @@
+/*
+MIT License
+
+Copyright (c) 2017 Alan Tonks
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 #include <iostream>
 #include <string>
 #include <vector>
-#include "serial.h"
 #include <cmath>
+#include "serial.h"
+#include "gps.h"
 
 // useful calculations: http://www.movable-type.co.uk/scripts/latlong.html
-    
-Serial gps(4800,"/dev/ttyUSB0");
-
-struct UTC {
-    int rawUTC;
-    int hours;
-    int minutes;
-    int seconds;
-};
-
-struct GPGGA { /* Global Positioning System Fix Data */
-    UTC     time;
-    double  latitude;  // ddmm.mmmm
-    char    latDirection;
-    double  longitude;  //dddmm.mmmm
-    char    longDirection;
-    int     fix;
-    int     satsInView;
-    double  HDOP;
-    double  altitude;
-    double  geoid;
-    double  lastDGPS;
-    int     DGPSid;
-    int     checksum;
-};
 
 std::string getGPGGA()
 {
@@ -171,21 +171,4 @@ void printGGA(GPGGA data)
     std::cout << "Last DGPS: " << data.lastDGPS << std::endl;
     std::cout << "DGPS Station: " << data.DGPSid << std::endl;
     std::cout << "Checksum: " << std::hex << data.checksum << std::dec << std::endl;
-}
-
-int main()
-{
-    std::string data = getGPGGA();
-    std::vector<std::string> parsed_data{split(data, ',')};
-    GPGGA first = assignGGA(parsed_data);
-    printGGA(first);
-
-    data = getGPGGA();
-    parsed_data = split(data, ',');
-    GPGGA second = assignGGA(parsed_data);
-    printGGA(second);
-
-    std::cout << "\n--------------------\nDistance: " << distance(first.latitude, first.longitude, 36.1699412, -115.139829) << std::endl;
-    std::cout << "Bearing: " << bearing(first.latitude, first.longitude, 36.1699412, -115.139829) << " degrees\n";
-    return 0;
 }
