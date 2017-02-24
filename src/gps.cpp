@@ -23,10 +23,7 @@ SOFTWARE.
 */
 
 #include <iostream>
-#include <string>
-#include <vector>
 #include <cmath>
-#include "serial.h"
 #include "gps.h"
 
 std::string GPS::getGPGGA()
@@ -103,7 +100,7 @@ UTC GPS::formatTime(std::string utc)
 	return time;
 }
 
-GPGGA GPS::assignGPGGA(const &std::vector<std::string> sentence)
+GPGGA GPS::assignGPGGA(std::vector<std::string> sentence)
 {
     GPGGA nmea;
     nmea.time = formatTime(data[1]);

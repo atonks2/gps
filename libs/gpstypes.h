@@ -24,4 +24,4 @@ struct GPGGA { /* Global Positioning System Fix Data */
 	int     checksum;
 };
 
-#endif GPSTYPES_H
+#endif  // GPSTYPES_H

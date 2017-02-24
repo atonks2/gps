@@ -33,7 +33,7 @@ SOFTWARE.
 class GPS : public Serial {
 public:
 	GPS() : Serial(4800, "/dev/ttyUSB0") {};
-	GPS(speed_t baud, std::string port) : Serial(baud, port);
+	GPS(speed_t baud, std::string port) : Serial(baud, port) {};
 
 	// Used to calculate checksum of sentence to be sent
 	// std::string sentence is a nmea format string without the checksum
@@ -75,7 +75,9 @@ private:
 	UTC formatTime(std::string utc);
 
 	// Takes a nmea sentence parsed into a vector and assigns values to members of struct GPGGA
-	GPGGA assignGPGGA(const &std::vector<std::string> sentence);
+	GPGGA assignGPGGA(std::vector<std::string> sentence);
+
+	GPGGA currentGPGGA;
 };
 
-#endif GPS_H
+#endif  // GPS_H
