@@ -7,7 +7,7 @@ int main()
 {
 	GPS gps(4800, "/dev/ttyUSB0");
 
-	GPGGA data{ gps.updateGPGGA() };
+	GPGGA data = gps.updateGPGGA();
 	gps.printGPGGA(data);
 
 	return 0;
