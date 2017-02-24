@@ -30,7 +30,7 @@ std::string GPS::getGPGGA()
 {
     std::string data;
     do {
-        data = gps.serialRead();
+        data = serialRead();
     } while (data.substr(0,6) != "$GPGGA");
     return data;
 }
