@@ -129,15 +129,15 @@ double GPS::distance(double latA, double longA, double latB, double longB)
 {
 	const double radius = 6378.137;  // Radius at equator
 	const double to_radians = (3.1415926536 / 180.00);
-	lat_a *= to_radians;
-	lat_b *= to_radians;
-	long_a *= to_radians;
-	long_b *= to_radians;
+	latA *= to_radians;
+	latB *= to_radians;
+	longA *= to_radians;
+	longB *= to_radians;
 	
-	double d_lat = lat_b - lat_a;
-	double d_long = long_b - long_a;
+	double d_lat = latB - latA;
+	double d_long = longB - longA;
 	
-	double a = pow(sin(d_lat/2),2) + pow(sin(d_long/2),2) * cos(lat_a) * cos(lat_b);
+	double a = pow(sin(d_lat/2),2) + pow(sin(d_long/2),2) * cos(latA) * cos(latB);
 	double c = 2 * atan2(sqrt(a),sqrt(1-a));
 	
 	return (radius * c);
@@ -148,16 +148,16 @@ double GPS::bearing(double latA, double longA, double latB, double longB)
     const double to_radians = (3.1415926536 / 180.00);
     const double to_degrees = (180.00 / 3.1415926536);
 
-    lat_a *= to_radians;
-    lat_b *= to_radians;
-    long_a *= to_radians;
-    long_b *= to_radians;
+    latA *= to_radians;
+    latB *= to_radians;
+    longA *= to_radians;
+    longB *= to_radians;
 
-    double d_lat = lat_b - lat_a;
-    double d_long = long_b - long_a;
+    double d_lat = latB - latA;
+    double d_long = longB - longA;
 
-    double y = sin(d_long) * cos(lat_b);
-    double x = (cos(lat_a) * sin(lat_b)) - (sin(lat_a) * cos(lat_b) * cos(d_long));
+    double y = sin(d_long) * cos(latB);
+    double x = (cos(latA) * sin(latB)) - (sin(latA) * cos(latB) * cos(d_long));
 
     return ((atan2(y, x) * to_degrees) + 360.00);
 }
@@ -188,5 +188,6 @@ GPGGA GPS::updateGPGGA()
 	std::string data = getGPGGA();
 	std::vector<std::string> parsed_data{ split(data, ',') };
 
-	return assignGPGGA(parsed_data);
+	currentGPGGA = assignGPGGA(parsed_data);
+	return currentGPGGA;
 }
